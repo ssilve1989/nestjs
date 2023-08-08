@@ -417,7 +417,10 @@ export class AmqpConnection {
           channel.ack(msg);
         } catch (e) {
           if (isNull(msg)) {
-            return;
+            // Consumer Cancellation https://www.rabbitmq.com/consumer-cancel.html is signaled as a null message
+            // and not raised as an error. In these cases, the queue is no longer valid so the consumer
+            // can decide what to do in this case.
+            return msgOptions.consumerCancellationHandler?.(channel, queue);
           } else {
             const errorHandler =
               msgOptions.errorHandler ||

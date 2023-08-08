@@ -1,6 +1,6 @@
 import { LoggerService } from '@nestjs/common';
 import { AmqpConnectionManagerOptions } from 'amqp-connection-manager';
-import { ConsumeMessage, Options } from 'amqplib';
+import { ConfirmChannel, ConsumeMessage, Options } from 'amqplib';
 import {
   AssertQueueErrorHandler,
   MessageErrorHandler,
@@ -77,9 +77,15 @@ export interface MessageHandlerOptions {
    * A function that will be called if an error is thrown during queue creation (i.e. during channel.assertQueue)
    */
   assertQueueErrorHandler?: AssertQueueErrorHandler;
+  consumerCancellationHandler?: ConsumerCancellationHandler;
   allowNonJsonMessages?: boolean;
   createQueueIfNotExists?: boolean;
 }
+
+export type ConsumerCancellationHandler = (
+  channel: ConfirmChannel,
+  queueName: string
+) => void | Promise<void>;
 
 export interface ConnectionInitOptions {
   wait?: boolean;
